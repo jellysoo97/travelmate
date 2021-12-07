@@ -1,6 +1,6 @@
 from models import UserData
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, IntegerField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, IntegerField, TextAreaField, SelectField, BooleanField
 from wtforms.validators import DataRequired, EqualTo
 from flask import Flask, request, render_template, redirect, session
 
@@ -23,12 +23,17 @@ class Condition(FlaskForm):
     travelLang = SelectField('travelLang', validators=[DataRequired()])
 
 class CreateTeam(FlaskForm):
+    userNum = IntegerField('userNum', validators=[DataRequired()])
     teamName = StringField('teamNum', validators=[DataRequired()])
     teamIntro = TextAreaField('teamIntro', validators=[DataRequired()])
-    teamTo = StringField('teamTo', validators=[DataRequired()])
-    teamNumGoal = IntegerField('teamNumGoal', validators=[DataRequired()])
+    teamTo = SelectField('teamTo', validators=[DataRequired()])
+    teamNumGoal = SelectField('teamNumGoal', validators=[DataRequired()], choices=[])
     teamAddress = StringField('teamAddress', validators=[DataRequired()])
 
+class AddTeam(FlaskForm):
+    userNum = BooleanField('userNum', validators=[DataRequired()])
+    teamCode = BooleanField('teamCode', validators=[DataRequired()])
+
 class Satisfy(FlaskForm):
-    input_sat = StringField('userSat', validators=[DataRequired()])
+    input_sat = SelectField('userSat', validators=[DataRequired()], choices=[])
 

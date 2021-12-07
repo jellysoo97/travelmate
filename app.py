@@ -1,9 +1,8 @@
 import os
-import hashlib
-from forms import SignUp, Login, Condition, CreateTeam, Satisfy
+from forms import SignUp, Login, Condition, CreateTeam, Satisfy, AddTeam
 from flask import Flask, request, render_template, redirect, session
-from models import db, UserData, ConditionData, WaitTeamData, DoneTeamData, NeedLangData
-from sqlalchemy.sql import exists
+from models import db, UserData, ConditionData, WaitTeamData, DoneTeamData, NeedLangData, ContactData
+
 
 
 app = Flask(__name__)
@@ -11,7 +10,7 @@ app = Flask(__name__)
 @app.route('/', methods=['GET'])
 def home():
     userid = session.get('userId', None)
-    return render_template('base.html', userId=userid)
+    return render_template('home.html', userId=userid)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -23,19 +22,49 @@ def checkValid():
         userdata = UserData.query.filter(UserData.userId == userid).first()
         if not userdata:
             form.userId.errors.append('잘못된 아이디입니다.')
-            return render_template('index.html', form=form)
+            return render_template('login.html', form=form)
         elif userdata.userPw != password:
             form.userPw.errors.append("잘못된 비밀번호 입니다.")
-            return render_template('index.html', form=form)
+            return render_template('login.html', form=form)
         else:
-            done_user = DoneTeamData.query.join(UserData, UserData.userNum == DoneTeamData.userNum)
-            if done_user is exists:
-                return redirect("/satisfy")
+            session['userId'] = userid
+            done_user = db.session.query(DoneTeamData).\
+                filter(DoneTeamData.userNum == UserData.userNum).\
+                filter(UserData.userId==userid).all()
+            if done_user:
+                return redirect('/satisfy')
             else:
-                session['userId'] = userid
                 return redirect("/condition")
 
-    return render_template('index.html', form=form)
+    return render_template('login.html', form=form)
+
+
+@app.route('/satisfy', methods=['Get', 'POST'])
+def ask_satisfy():
+    userid = session.get('userId', None)
+    form = Satisfy()
+    input_sat = {'Yes':'네 다른 여행지도 보고 싶습니다.' , 'N0':'아니요 새로운 팀을 원합니다.'}
+    for key in input_sat.keys():
+        form.input_sat.choices.append(input_sat[key])
+    if form.validate_on_submit():
+        usersat = db.session.query(DoneTeamData).filter(DoneTeamData.userNum == UserData.userNum).\
+            filter(UserData.userId == userid).first()
+        usersat.userSat = form.data.get('input_sat')
+        db.session.commit()
+        if usersat.userSat == '네 다른 여행지도 보고 싶습니다.':
+            return redirect('/condition')
+        else:
+            doneteamdata = db.session.query(DoneTeamData).filter(DoneTeamData.userSat == '아니요 새로운 팀을 원합니다.').first()
+            recnum = db.session.query(WaitTeamData).filter(WaitTeamData.teamCode == doneteamdata.teamCode).first()
+            recnum.teamRecNum -= 1
+            db.session.delete(doneteamdata)
+            db.session.commit()
+            # waitteamdata = db.session.query(WaitTeamData).filter(WaitTeamData.teamRecNum == 0).all()
+            # if waitteamdata:
+            #     db.session.delete(waitteamdata)
+            #     db.session.commit()
+            return redirect('/condition')
+    return render_template('satisfy_x.html', form=form, userid=userid)
 
 
 
@@ -53,7 +82,7 @@ def insertUserData():
         if userid:
             form.userId.errors.append('이미 가입된 아이디입니다.')
         if form.userId.errors:
-            return render_template('/register.html', form=form)
+            return render_template('register_x.html', form=form)
 
         userdata = UserData()
         userdata.userId = form.data.get('userId')
@@ -65,43 +94,95 @@ def insertUserData():
         db.session.commit()
 
         return redirect('/')
-    return render_template('register.html', form=form)
+    return render_template('register_x.html', form=form)
 
 @app.route('/condition', methods=['GET', 'POST'])
 def sendCondition():
+    userid = session.get('userId', None)
     form = Condition()
     form.travelDes.choices = [(a.countryName) for a in NeedLangData.query.order_by(NeedLangData.countryName)]
-    form.travelLang.choices = [(a.countryLang) for a in NeedLangData.query.order_by(NeedLangData.countryName)]
+    form.travelLang.choices = [(a.countryLang) for a in NeedLangData.query.group_by(NeedLangData.countryLang)]
 
     travelNum = {'2명': 2, '3명':3, '4명':4}
     for key in travelNum.keys():
         form.travelNum.choices.append(travelNum[key])
 
     if form.validate_on_submit():
-        #waitteamdata에 조건에 맞는 팀이 있는지 탐색 / 있으면 waitteamlist 없으면 teamcreate
-        return render_template('condition.html', form=form, result='저장했습니다.') #왼쪽코드는 임시코드
-    return render_template('condition.html', form=form)
+        conditiondata = ConditionData()
+        conditiondata.travelDes = form.data.get('travelDes')
+        conditiondata.travelNum = form.data.get('travelNum')
+        conditiondata.travelLang = form.data.get('travelLang')
+        conditiondata.userNum = db.session.query(UserData.userNum).filter(UserData.userId==userid)
 
-@app.route('/createteam', methods=['GET', 'POST'])
+        db.session.add(conditiondata)
+        db.session.commit()
+        return redirect('/waitteam')
+    return render_template('condition.html', form=form, userid=userid)
+
+
+@app.route('/teamcreate', methods=['GET', 'POST'])
 def insertWaitTeamData():
     userid = session.get('userId', None)
     form = CreateTeam()
+    form.teamTo.choices = [(a.countryName) for a in NeedLangData.query.group_by(NeedLangData.countryName)]
+    teamNumGoal = {'2명': 2, '3명': 3, '4명': 4}
+    for key in teamNumGoal.keys():
+        form.teamNumGoal.choices.append(teamNumGoal[key])
     if form.validate_on_submit():
         doneteamdata = DoneTeamData()
-        doneteamdata.teamName = form.data.get('teamName')
-        doneteamdata.teamIntro = form.data.get('teamIntro')
-        doneteamdata.teamTo = form.data.get('teamTo')
-        doneteamdata.teamNumGoal = form.data.get('teamNumGoal')
-
+        waitteamdata = WaitTeamData()
+        contactdata = ContactData()
+        doneteamdata.userNum = db.session.query(UserData.userNum).filter(UserData.userId==userid)
+        waitteamdata.teamName = form.data.get('teamName')
+        waitteamdata.teamIntro = form.data.get('teamIntro')
+        waitteamdata.teamTo = form.data.get('teamTo')
+        waitteamdata.teamNumGoal = form.data.get('teamNumGoal')
+        contactdata.teamAddress = form.data.get('teamAddress')
+        waitteamdata.teamRecNum = 1
+        doneteamdata.teamCode = db.session.query(WaitTeamData.teamCode).filter(WaitTeamData.teamName==waitteamdata.teamName)
+        contactdata.teamCode = db.session.query(WaitTeamData.teamCode).filter(WaitTeamData.teamName==waitteamdata.teamName)
         db.session.add(doneteamdata)
+        db.session.add(waitteamdata)
+        db.session.add(contactdata)
+
+
+
         db.session.commit()
 
-        return redirect('/condition')
-    return render_template('/createteam.html', form=form)
+        return redirect('/')
+    return render_template('teamcreate_x.html', form=form, userid=userid)
 
-@app.route('/waitteamlist', methods=['GET', 'POST'])
+@app.route('/waitteam', methods=['GET', 'POST'])
 def findTeam():
-    WaitTeamData.query.all()
+    userid = session.get('userId', None)
+    recent_id = db.session.query(ConditionData.id).order_by(ConditionData.id.desc()).first()
+    team_list = db.session.query(WaitTeamData).\
+        filter(WaitTeamData.teamTo == ConditionData.travelDes, WaitTeamData.teamNumGoal == ConditionData.travelNum).\
+        filter(ConditionData.id == recent_id[0]).all()
+
+    return render_template('teamlist.html', userid=userid, team_list=team_list)
+
+@app.route('/teaminfo/<int:teamCode>', methods=['GET', 'POST'])
+def teaminfo(teamCode):
+    userid = session.get('userId', None)
+    team = WaitTeamData.query.get_or_404(teamCode)
+    userLang_list = db.session.query(UserData.userLang).\
+        filter(UserData.userNum==DoneTeamData.userNum).\
+        group_by(UserData.userLang).all()
+
+    return render_template('teaminfo.html', team=team, userLang_list=userLang_list, userid=userid)
+
+@app.route('/teaminfo/end_x/<int:teamCode>', methods=['GET', 'POST'])
+def getAddress(teamCode):
+    userid = session.get('userId', None)
+    team = ContactData.query.get(teamCode)
+    user = DoneTeamData(teamCode=teamCode, userNum=db.session.query(UserData.userNum).filter(UserData.userId==userid))
+    recnum = db.session.query(WaitTeamData).filter(WaitTeamData.teamCode == teamCode).first()
+    recnum.teamRecNum += 1
+    db.session.add(user)
+    db.session.commit()
+
+    return render_template('end_x.html', team=team, userid=userid)
 
 
 
@@ -120,3 +201,9 @@ db.create_all()
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
+
+
+#팀합류하기
+#합류한 팀에는 더이상 팀합류 버튼 불가
+#teamRecNum == 0 인 팀은 지우기
+#teamNumGoal에 도달한 팀은 팀합류 버튼 불가
