@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
       <title>{% block title %}{% endblock %}</title>
       <style>
         .breadcrumb-item+.breadcrumb-item::before { content: ">"; }
@@ -21,8 +21,8 @@
         </div>
 
         <nav aria-label="breadcrumb"> <!-- breadcrumb 맨 위의 페이지 이동 nav -->
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="home">홈</a></li>
+          <ol class="breadcrumb" style="width: 100%; font-size: 13px; position: absolute; top: 12px;">
+            <li class="breadcrumb-item" ><a href="home">홈</a></li>
             <li class="breadcrumb-item"><a href="condition">매칭 조건선택</a></li>
             <li class="breadcrumb-item"><a href="teamlist">매칭된 팀목록</a></li>
             <li class="breadcrumb-item"><a href="teaminfo">팀정보</a></li>
@@ -33,12 +33,10 @@
         <button type="button" onclick="location.href='/logout'" id="logout">로그아웃</button>
 
         {% block content %}{% endblock %} <!-- 각 페이지의 main 내용이 들어갈 부분 -->
-
+        
       </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script></script>
 
   </body>
 </html>

@@ -7,17 +7,17 @@
     <body>
         {% block content %}
             <div class="ti_wholebox">
-                <div class="ti_textbox" id="box1">
-                    <img src="{{ url_for('static', filename='img/memoji1.png') }}">
-                    <div class="ti_info">{{team.teamName}}팀에 welcome!</div>
+                <div class="ti_textbox">
+                    <img src="{{ url_for('static', filename='img/memoji1.png') }}" id="img1">
+                    <div class="ti_info" id="box1">{{team.teamName}}팀에 welcome!</div>
                 </div>
-                <div class="ti_textbox" id="box2">
-                    <img src="{{ url_for('static', filename='img/memoji2.png') }}">
-                    <div class="ti_info">{{team.teamTo}}으로 여행갈 예정!</div>
+                <div class="ti_textbox">
+                    <img src="{{ url_for('static', filename='img/memoji2.png') }}" id="img2">
+                    <div class="ti_info" id="box2">{{team.teamTo}}으로 여행갈 예정!</div>
                 </div>
-                <div class="ti_textbox" id="box3">
-                    <img src="{{ url_for('static', filename='img/memoji3.png') }}">
-                    <div class="ti_info">
+                <div class="ti_textbox">
+                    <img src="{{ url_for('static', filename='img/memoji3.png') }}" id="img3">
+                    <div class="ti_info" id="box3">
                         {% for user in userLang_list %}
                             {{user.userLang}}능력자+
                             {%if loop.index == (userLang_list|length-1) %}
@@ -26,21 +26,47 @@
                         {% endfor %}
                     </div>
                 </div>
-                <div class="ti_textbox" id="box4">
-                    <img src="{{ url_for('static', filename='img/memoji4.png') }}">
-                    <div class="ti_info">{{team.teamRecNum}}명만 더 모이면 돼!</div>
+                <div class="ti_textbox">
+                    <img src="{{ url_for('static', filename='img/memoji4.png') }}" id="img4">
+                    <div class="ti_info" id="box4">{{team.teamRecNum}}명만 더 모이면 돼!</div>
                 </div>
-                <div class="ti_textbox" id="box5">
-                    <img src="{{ url_for('static', filename='img/memoji5.png') }}">
-                    <div class="ti_info">{{team.teamName}}팀을 간단하게 소개할게!<br>{{team.teamIntro}}</div>
+                <div class="ti_textbox">
+                    <img src="{{ url_for('static', filename='img/memoji5.png') }}" id="img5">
+                    <div class="ti_info" id="box5">{{team.teamName}}팀을 간단하게 소개할게!<br>{{team.teamIntro}}</div>
                 </div>
-                    <button type="button" onclick="history.back()" class="ti_btn" id="btn1">뒤로가기</button>
-                <button type="button" class="ti_btn" id="btn2">
-                <a href="end_x/{{team.teamCode}}">
-                    팀합류
-                </a></button>
-
             </div>
+            <button type="button" onclick="history.back()" class="ti_btn" id="btn1">뒤로가기</button>
+            <button type="button" class="ti_btn" id="btn2">
+            <a href="end_x/{{team.teamCode}}">
+                팀합류
+            </a></button>
+
+            <script>
+                var img_list = ["img1", "img2", "img3", "img4", "img5"]; //이미지 id 리스트
+                var info_list = ["box1", "box2", "box3", "box4", "box5"]; //정보박스 id 리스트
+                
+                function position(){ //홀짝 위치,배경색 반전 js 함수
+                    for (var i=0; i<5; i++){
+                        var img = document.getElementById(img_list[i]);
+                        var info = document.getElementById(info_list[i]);
+                        if (i % 2 != 0){ 
+                            img.style.position = "absolute";
+                            img.style.left = "10px";
+                            info.style.position = "absolute";
+                            info.style.right = "10px";
+                            info.style.backgroundColor = "#B5DBFC";
+                        }
+                        else {
+                            img.style.position = "absolute";
+                            img.style.right = "10px";
+                            info.style.position = "absolute";
+                            info.style.left = "10px";
+                            info.style.backgroundColor = "#F5F5DC";
+                        }
+                    }
+                }
+                position();
+            </script>
 
         {% endblock %}
 
