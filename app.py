@@ -1,5 +1,5 @@
 import os
-from forms import SignUp, Login, Condition, CreateTeam, Satisfy, AddTeam
+from forms import SignUp, Login, Condition, CreateTeam, Satisfy
 from flask import Flask, request, render_template, redirect, session
 from models import db, UserData, ConditionData, WaitTeamData, DoneTeamData, NeedLangData, ContactData
 
@@ -59,10 +59,9 @@ def ask_satisfy():
             recnum.teamRecNum -= 1
             db.session.delete(doneteamdata)
             db.session.commit()
-            # waitteamdata = db.session.query(WaitTeamData).filter(WaitTeamData.teamRecNum == 0).all()
-            # if waitteamdata:
-            #     db.session.delete(waitteamdata)
-            #     db.session.commit()
+            waitteamdata = db.session.query(WaitTeamData).filter(WaitTeamData.teamRecNum == 0).first()
+            db.session.delete(waitteamdata)
+            db.session.commit()
             return redirect('/condition')
     return render_template('satisfy_x.html', form=form, userid=userid)
 
@@ -144,9 +143,6 @@ def insertWaitTeamData():
         db.session.add(doneteamdata)
         db.session.add(waitteamdata)
         db.session.add(contactdata)
-
-
-
         db.session.commit()
 
         return redirect('/')
@@ -157,7 +153,7 @@ def findTeam():
     userid = session.get('userId', None)
     recent_id = db.session.query(ConditionData.id).order_by(ConditionData.id.desc()).first()
     team_list = db.session.query(WaitTeamData).\
-        filter(WaitTeamData.teamTo == ConditionData.travelDes, WaitTeamData.teamNumGoal == ConditionData.travelNum).\
+        filter(WaitTeamData.teamTo == ConditionData.travelDes, WaitTeamData.teamNumGoal == ConditionData.travelNum, WaitTeamData.teamRecNum < WaitTeamData.teamNumGoal).\
         filter(ConditionData.id == recent_id[0]).all()
 
     return render_template('teamlist.html', userid=userid, team_list=team_list)
@@ -168,6 +164,7 @@ def teaminfo(teamCode):
     team = WaitTeamData.query.get_or_404(teamCode)
     userLang_list = db.session.query(UserData.userLang).\
         filter(UserData.userNum==DoneTeamData.userNum).\
+        filter(DoneTeamData.teamCode == teamCode).\
         group_by(UserData.userLang).all()
 
     return render_template('teaminfo.html', team=team, userLang_list=userLang_list, userid=userid)
@@ -203,7 +200,7 @@ if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
 
 
-#팀합류하기
+
 #합류한 팀에는 더이상 팀합류 버튼 불가
 #teamRecNum == 0 인 팀은 지우기
 #teamNumGoal에 도달한 팀은 팀합류 버튼 불가

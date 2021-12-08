@@ -1,8 +1,6 @@
-from models import UserData
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, IntegerField, TextAreaField, SelectField, BooleanField
+from wtforms import StringField, PasswordField, IntegerField, TextAreaField, SelectField, BooleanField
 from wtforms.validators import DataRequired, EqualTo
-from flask import Flask, request, render_template, redirect, session
 
 
 class SignUp(FlaskForm):
@@ -30,9 +28,6 @@ class CreateTeam(FlaskForm):
     teamNumGoal = SelectField('teamNumGoal', validators=[DataRequired()], choices=[])
     teamAddress = StringField('teamAddress', validators=[DataRequired()])
 
-class AddTeam(FlaskForm):
-    userNum = BooleanField('userNum', validators=[DataRequired()])
-    teamCode = BooleanField('teamCode', validators=[DataRequired()])
 
 class Satisfy(FlaskForm):
     input_sat = SelectField('userSat', validators=[DataRequired()], choices=[])
