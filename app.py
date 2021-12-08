@@ -29,7 +29,7 @@ def checkValid():
         else:
             session['userId'] = userid
             done_user = db.session.query(DoneTeamData).\
-                filter(DoneTeamData.userNum == UserData.userNum).\
+                filter(DoneTeamData.userNum == UserData.userNum, DoneTeamData.userSat == None).\
                 filter(UserData.userId==userid).all()
             if done_user:
                 return redirect('/satisfy')
@@ -47,7 +47,8 @@ def ask_satisfy():
     for key in input_sat.keys():
         form.input_sat.choices.append(input_sat[key])
     if form.validate_on_submit():
-        usersat = db.session.query(DoneTeamData).filter(DoneTeamData.userNum == UserData.userNum).\
+
+        usersat = db.session.query(DoneTeamData).filter(DoneTeamData.userNum == UserData.userNum, DoneTeamData.userSat == None).\
             filter(UserData.userId == userid).first()
         usersat.userSat = form.data.get('input_sat')
         db.session.commit()
@@ -59,8 +60,7 @@ def ask_satisfy():
             recnum.teamRecNum -= 1
             db.session.delete(doneteamdata)
             db.session.commit()
-            waitteamdata = db.session.query(WaitTeamData).filter(WaitTeamData.teamRecNum == 0).fisrt()
-            db.session.delete(waitteamdata)
+            WaitTeamData.query.filter_by(teamRecNum=0).delete()
             db.session.commit()
             return redirect('/condition')
     return render_template('satisfy_x.html', form=form, userid=userid)
