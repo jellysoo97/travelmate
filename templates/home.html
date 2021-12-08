@@ -1,0 +1,29 @@
+<!-- 제일 처음에 뜨는 홈 페이지 -->
+<!DOCTYPE html>
+<html lang="ko">
+    {% extends "base.html" %}
+    <!-- base.html 상속 -->
+    <head>
+        {% block title %}홈{% endblock %}
+    </head>
+    <body>
+    <!-- 메인 파트에 들어갈 부분 -->
+        {% block content %}
+            {% if userId %}
+                <h3>{{userId}}님 반갑습니다.</h3>
+                <a href="condition">
+                    <h4>여기를 누르면 매칭 조건선택 페이지로 이동합니다.</h4>
+                </a>
+
+            {% else %}
+                <h3>로그인이 필요합니다.</h3>
+                <a href="login">
+                    <h4>여기를 누르면 로그인 페이지로 이동합니다.</h4>
+                </a>
+
+            {% endif %}
+    
+        {% endblock %}
+        
+  </body>
+</html>
