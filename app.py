@@ -59,7 +59,7 @@ def ask_satisfy():
             recnum.teamRecNum -= 1
             db.session.delete(doneteamdata)
             db.session.commit()
-            waitteamdata = db.session.query(WaitTeamData).filter(WaitTeamData.teamRecNum == 0).first()
+            waitteamdata = db.session.query(WaitTeamData).filter(WaitTeamData.teamRecNum == 0).fisrt()
             db.session.delete(waitteamdata)
             db.session.commit()
             return redirect('/condition')
