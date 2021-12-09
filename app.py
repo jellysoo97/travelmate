@@ -169,7 +169,7 @@ def teaminfo(teamCode):
 
     return render_template('teaminfo.html', team=team, userLang_list=userLang_list, userid=userid)
 
-@app.route('/teaminfo/end_x/<int:teamCode>', methods=['GET', 'POST'])
+@app.route('/teaminfo/end/<int:teamCode>', methods=['GET', 'POST'])
 def getAddress(teamCode):
     userid = session.get('userId', None)
     team = ContactData.query.get(teamCode)
@@ -179,7 +179,7 @@ def getAddress(teamCode):
     db.session.add(user)
     db.session.commit()
 
-    return render_template('end_x.html', team=team, userid=userid)
+    return render_template('end.html', team=team, userid=userid)
 
 
 
