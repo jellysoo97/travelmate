@@ -19,7 +19,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    
+
                         {% for team in team_list %}
                             {% if loop.index%2 == 1  %}
                                 <tr style="background-color: #F5F5DC;">
@@ -28,6 +28,7 @@
                                         {{ team.teamTo }}
                                     </td>
                                     <td>{{ team.teamRecNum }}/{{ team.teamNumGoal }}</td>
+                                    
                                 </tr>
                             {% endif %}
                             {% if loop.index%2 == 0  %}
@@ -46,21 +47,14 @@
 
                 {% else %}
                     <div class="tl_teamnobox">
-                        <img src="{{ url_for('static', filename='img/cryboo.png') }}" style="width: 200px; height: 200px;">
-                        <p>매칭된 팀이 없습니다.</p>
-                        <p>새로운 팀을 생성할까요?</p>
-                        <a href="teamcreate">
-                            <button type="button" class="login_btn">팀 생성하기</button>
-                        </a>
-                        <a href="condition">
-                            <button type="button" class="login_btn" id="tl_again">다시 조건선택하기</button>
-                        </a>
+                        <img src="{{ url_for('static', filename='img/cryboo.png') }}" style="width: 250px; height: 250px;">
+                        <p>합류한 팀이 없습니다.</p>
                     </div>
 
                 {% endif %}
             </div>
-    
+
         {% endblock %}
-        
+
     </body>
 </html>

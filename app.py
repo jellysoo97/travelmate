@@ -1,6 +1,6 @@
 import os
 from forms import SignUp, Login, Condition, CreateTeam, Satisfy
-from flask import Flask, request, render_template, redirect, session
+from flask import Flask, request, render_template, redirect, session, flash
 from models import db, UserData, ConditionData, WaitTeamData, DoneTeamData, NeedLangData, ContactData
 
 
@@ -166,6 +166,12 @@ def teaminfo(teamCode):
         filter(UserData.userNum==DoneTeamData.userNum).\
         filter(DoneTeamData.teamCode == teamCode).\
         group_by(UserData.userLang).all()
+    myteam = db.session.query(DoneTeamData).\
+        filter(UserData.userNum == DoneTeamData.userNum, DoneTeamData.teamCode == teamCode). \
+        filter(UserData.userId == userid).first()
+    if myteam:
+        flash('이미 합류한 팀입니다.')
+        return render_template('teaminfo.html', team=team, userLang_list=userLang_list, userid=userid, myteam=myteam)
 
     return render_template('teaminfo.html', team=team, userLang_list=userLang_list, userid=userid)
 
@@ -173,13 +179,29 @@ def teaminfo(teamCode):
 def getAddress(teamCode):
     userid = session.get('userId', None)
     team = ContactData.query.get(teamCode)
-    user = DoneTeamData(teamCode=teamCode, userNum=db.session.query(UserData.userNum).filter(UserData.userId==userid))
-    recnum = db.session.query(WaitTeamData).filter(WaitTeamData.teamCode == teamCode).first()
-    recnum.teamRecNum += 1
-    db.session.add(user)
-    db.session.commit()
+    myteam = db.session.query(DoneTeamData).\
+        filter(UserData.userNum == DoneTeamData.userNum, DoneTeamData.teamCode == teamCode).\
+        filter(UserData.userId==userid).first()
 
+    if not myteam:
+        user = DoneTeamData(teamCode=teamCode, userNum=db.session.query(UserData.userNum).filter(UserData.userId==userid))
+        recnum = db.session.query(WaitTeamData).filter(WaitTeamData.teamCode == teamCode).first()
+        recnum.teamRecNum += 1
+        db.session.add(user)
+        db.session.commit()
+        return render_template('end.html', team=team, userid=userid)
     return render_template('end.html', team=team, userid=userid)
+
+
+
+@app.route('/showteam', methods=['GET', 'POST'])
+def showTeam():
+    userid = session.get('userId', None)
+    team_list = db.session.query(WaitTeamData). \
+        filter(WaitTeamData.teamCode == DoneTeamData.teamCode, DoneTeamData.userNum == UserData.userNum).\
+        filter(UserData.userId == userid)
+    return render_template('myteam.html', userid=userid, team_list=team_list)
+
 
 
 
@@ -200,7 +222,3 @@ if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
 
 
-
-#합류한 팀에는 더이상 팀합류 버튼 불가
-#teamRecNum == 0 인 팀은 지우기
-#teamNumGoal에 도달한 팀은 팀합류 버튼 불가

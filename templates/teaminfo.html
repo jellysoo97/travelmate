@@ -6,69 +6,88 @@
     </head>
     <body>
         {% block content %}
-            <div class="ti_wholebox">
-                <div class="ti_textbox">
-                    <img src="{{ url_for('static', filename='img/memoji1.png') }}" id="img1">
-                    <div class="ti_info" id="box1">{{team.teamName}}팀에 welcome!</div>
-                </div>
-                <div class="ti_textbox">
-                    <img src="{{ url_for('static', filename='img/memoji2.png') }}" id="img2">
-                    <div class="ti_info" id="box2">{{team.teamTo}}으로 여행갈 예정!</div>
-                </div>
-                <div class="ti_textbox">
-                    <img src="{{ url_for('static', filename='img/memoji3.png') }}" id="img3">
-                    <div class="ti_info" id="box3">
-                        {% for user in userLang_list %}
-                            {{user.userLang}}능력자+
-                            {%if loop.index == (userLang_list|length-1) %}
-                                {{user.userLang}}능력자 조합이야
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="ti_textbox">
-                    <img src="{{ url_for('static', filename='img/memoji4.png') }}" id="img4">
-                    <div class="ti_info" id="box4">{{team.teamRecNum}}명만 더 모이면 돼!</div>
-                </div>
-                <div class="ti_textbox">
-                    <img src="{{ url_for('static', filename='img/memoji5.png') }}" id="img5">
-                    <div class="ti_info" id="box5">{{team.teamName}}팀을 간단하게 소개할게!<br>{{team.teamIntro}}</div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <script>
+                    alert("{{messages[-1]}}")
+                </script>
+            {% endif %}
+        {% endwith %}
+        <div class="ti_wholebox">
+            <div class="ti_textbox">
+                <img src="{{ url_for('static', filename='img/memoji1.png') }}" id="img1">
+                <div class="ti_info" id="box1">{{team.teamName}}팀에 welcome!</div>
+            </div>
+            <div class="ti_textbox">
+                <img src="{{ url_for('static', filename='img/memoji2.png') }}" id="img2">
+                <div class="ti_info" id="box2">{{team.teamTo}}으로 여행갈 예정!</div>
+            </div>
+            <div class="ti_textbox">
+                <img src="{{ url_for('static', filename='img/memoji3.png') }}" id="img3">
+                <div class="ti_info" id="box3">
+                    {% for user in userLang_list %}
+                        {%if loop.index < (userLang_list|length) %}
+                        {{user.userLang}}능력자+
+                        {%else%}
+                        {{user.userLang}}능력자 조합이야
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
-            <button type="button" onclick="history.back()" class="ti_btn" id="btn1">뒤로가기</button>
-            <button type="button" class="ti_btn" id="btn2">
-            <a href="end/{{team.teamCode}}">
-                팀합류
-            </a></button>
+            <div class="ti_textbox">
+                <img src="{{ url_for('static', filename='img/memoji4.png') }}" id="img4">
+                <div class="ti_info" id="box4">{{team.teamNumGoal - team.teamRecNum}}명만 더 모이면 돼!</div>
+            </div>
+            <div class="ti_textbox">
+                <img src="{{ url_for('static', filename='img/memoji5.png') }}" id="img5">
+                <div class="ti_info" id="box5">{{team.teamName}}팀을 간단하게 소개할게!<br>{{team.teamIntro}}</div>
+            </div>
+        </div>
 
-            <script>
-                var img_list = ["img1", "img2", "img3", "img4", "img5"]; //이미지 id 리스트
-                var info_list = ["box1", "box2", "box3", "box4", "box5"]; //정보박스 id 리스트
-                
-                function position(){ //홀짝 위치,배경색 반전 js 함수
-                    for (var i=0; i<5; i++){
-                        var img = document.getElementById(img_list[i]);
-                        var info = document.getElementById(info_list[i]);
-                        if (i % 2 != 0){ 
-                            img.style.position = "absolute";
-                            img.style.left = "10px";
-                            info.style.position = "absolute";
-                            info.style.right = "10px";
-                            info.style.backgroundColor = "#B5DBFC";
-                        }
-                        else {
-                            img.style.position = "absolute";
-                            img.style.right = "10px";
-                            info.style.position = "absolute";
-                            info.style.left = "10px";
-                            info.style.backgroundColor = "#F5F5DC";
-                        }
+        <button type="button" onclick="history.back()" class="ti_btn" id="btn1">뒤로가기</button>
+        <a href="end/{{team.teamCode}}">
+            <button type="button" class="ti_btn" id="btn2">
+                팀합류
+            </button>
+        </a>
+        
+
+        <script>
+            var img_list = ["img1", "img2", "img3", "img4", "img5"]; //이미지 id 리스트
+            var info_list = ["box1", "box2", "box3", "box4", "box5"]; //정보박스 id 리스트
+            
+            function position(){ //홀짝 위치,배경색 반전 js 함수
+                for (var i=0; i<5; i++){
+                    var img = document.getElementById(img_list[i]);
+                    var info = document.getElementById(info_list[i]);
+                    if (i % 2 != 0){ 
+                        img.style.position = "absolute";
+                        img.style.left = "10px";
+                        info.style.position = "absolute";
+                        info.style.right = "10px";
+                        info.style.backgroundColor = "#B5DBFC";
+                    }
+                    else {
+                        img.style.position = "absolute";
+                        img.style.right = "10px";
+                        info.style.position = "absolute";
+                        info.style.left = "10px";
+                        info.style.backgroundColor = "#F5F5DC";
                     }
                 }
-                position();
-            </script>
+            }
+            position();
 
-        {% endblock %}
+            function changebtn(){
+                var clicknum = sessionStorage.getItem("clicktime");
+                if (clicknum == "1"){
+                    document.getElementById("btn2").textContent = "팀주소";
+                }
+            }
+            changebtn();
+        </script>
+
+    {% endblock %}
 
   </body>
 </html>
