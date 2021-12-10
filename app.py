@@ -63,7 +63,7 @@ def ask_satisfy():
             WaitTeamData.query.filter_by(teamRecNum=0).delete()
             db.session.commit()
             return redirect('/condition')
-    return render_template('satisfy_x.html', form=form, userid=userid)
+    return render_template('satisfy.html', form=form, userid=userid)
 
 
 
@@ -81,7 +81,7 @@ def insertUserData():
         if userid:
             form.userId.errors.append('이미 가입된 아이디입니다.')
         if form.userId.errors:
-            return render_template('register_x.html', form=form)
+            return render_template('register.html', form=form)
 
         userdata = UserData()
         userdata.userId = form.data.get('userId')
@@ -93,7 +93,7 @@ def insertUserData():
         db.session.commit()
 
         return redirect('/')
-    return render_template('register_x.html', form=form)
+    return render_template('register.html', form=form)
 
 @app.route('/condition', methods=['GET', 'POST'])
 def sendCondition():
@@ -146,7 +146,7 @@ def insertWaitTeamData():
         db.session.commit()
 
         return redirect('/')
-    return render_template('teamcreate_x.html', form=form, userid=userid)
+    return render_template('teamcreate.html', form=form, userid=userid)
 
 @app.route('/waitteam', methods=['GET', 'POST'])
 def findTeam():
