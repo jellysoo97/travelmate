@@ -10,6 +10,12 @@
             {% if messages %}
                 <script>
                     alert("{{messages[-1]}}")
+                    var clicktime = 0;
+                    function info_clicknum(){
+                        clicktime = 2;
+                        sessionStorage.setItem("clicktime", clicktime);
+                    }
+                    info_clicknum();
                 </script>
             {% endif %}
         {% endwith %}
@@ -53,10 +59,10 @@
         
 
         <script>
-            var img_list = ["img1", "img2", "img3", "img4", "img5"]; //이미지 id 리스트
-            var info_list = ["box1", "box2", "box3", "box4", "box5"]; //정보박스 id 리스트
+            var img_list = ["img1", "img2", "img3", "img4", "img5"]; 
+            var info_list = ["box1", "box2", "box3", "box4", "box5"]; 
             
-            function position(){ //홀짝 위치,배경색 반전 js 함수
+            function position(){ 
                 for (var i=0; i<5; i++){
                     var img = document.getElementById(img_list[i]);
                     var info = document.getElementById(info_list[i]);
@@ -81,6 +87,9 @@
             function changebtn(){
                 var clicknum = sessionStorage.getItem("clicktime");
                 if (clicknum == "1"){
+                    document.getElementById("btn2").textContent = "팀합류";
+                }
+                else{
                     document.getElementById("btn2").textContent = "팀주소";
                 }
             }

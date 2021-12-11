@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, EqualTo
 class SignUp(FlaskForm):
     userId = StringField('userId', validators=[DataRequired(message='필숫값입니다.')])
     userPw = PasswordField('userPw', validators=[DataRequired(message='필숫값입니다.')])
-    repassword = PasswordField('repassword', validators=[DataRequired(message='비밀번호를 재입력하세요'), EqualTo('userPw')])
+    repassword = PasswordField('repassword', validators=[DataRequired(message='비밀번호를 재입력하세요'), EqualTo('userPw', message='비밀번호가 일치하지 않습니다.')])
     userMajor = StringField('useMajor', validators=[DataRequired(message='필숫값입니다.')])
     userLang = StringField('userLang', validators=[DataRequired(message='필숫값입니다.')])
 
@@ -21,7 +21,7 @@ class Condition(FlaskForm):
     travelLang = SelectField('travelLang', validators=[DataRequired()])
 
 class CreateTeam(FlaskForm):
-    userNum = IntegerField('userNum', validators=[DataRequired()])
+    userNum = SelectField('userNum', validators=[DataRequired()])
     teamName = StringField('teamNum', validators=[DataRequired()])
     teamIntro = TextAreaField('teamIntro', validators=[DataRequired()])
     teamTo = SelectField('teamTo', validators=[DataRequired()])

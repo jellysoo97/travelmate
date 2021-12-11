@@ -8,12 +8,21 @@
         {% block content %}
             <form method="post" action="/register" class="reg_main">         
                 {{form.csrf_token}}
+                {%if form.userId.errors%}
+                    <div class="register_box error">{{form.userId.errors.0}}</div>
+                {%endif%}
+
+                {%if form.repassword.errors%}
+                    <div class="register_box error">{{form.repassword.errors.0}}</div>
+                {%endif%}
+
                     <div class="form-group">
                         {{form.userId.label("ID")}}
                         {{form.userId(class="form-control",placeholder="ID")}}
                     </div>
                     <div class="form-group">
-                        {{form.userPw.label("비밀번호")}}                            {{form.userPw(class="form-control",placeholder="비밀번호")}}
+                        {{form.userPw.label("비밀번호")}}
+                        {{form.userPw(class="form-control",placeholder="비밀번호")}}
                     </div>
                     <div class="form-group">
                         {{form.repassword.label("비밀번호 확인")}}

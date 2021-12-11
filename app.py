@@ -80,7 +80,6 @@ def insertUserData():
         userid = UserData.query.filter(UserData.userId == form.userId.data).first()
         if userid:
             form.userId.errors.append('이미 가입된 아이디입니다.')
-        if form.userId.errors:
             return render_template('register.html', form=form)
 
         userdata = UserData()
@@ -122,7 +121,9 @@ def sendCondition():
 @app.route('/teamcreate', methods=['GET', 'POST'])
 def insertWaitTeamData():
     userid = session.get('userId', None)
+    userdata = UserData.query.filter(UserData.userId == userid).first()
     form = CreateTeam()
+    form.userNum.choices = [userdata.userNum]
     form.teamTo.choices = [(a.countryName) for a in NeedLangData.query.group_by(NeedLangData.countryName)]
     teamNumGoal = {'2명': 2, '3명': 3, '4명': 4}
     for key in teamNumGoal.keys():
@@ -143,8 +144,9 @@ def insertWaitTeamData():
         db.session.add(doneteamdata)
         db.session.add(waitteamdata)
         db.session.add(contactdata)
-        db.session.commit()
+        flash('팀생성이 완료되었습니다.')
 
+        db.session.commit()
         return redirect('/')
     return render_template('teamcreate.html', form=form, userid=userid)
 
@@ -199,10 +201,8 @@ def showTeam():
     userid = session.get('userId', None)
     team_list = db.session.query(WaitTeamData). \
         filter(WaitTeamData.teamCode == DoneTeamData.teamCode, DoneTeamData.userNum == UserData.userNum).\
-        filter(UserData.userId == userid)
+        filter(UserData.userId == userid).all()
     return render_template('myteam.html', userid=userid, team_list=team_list)
-
-
 
 
 

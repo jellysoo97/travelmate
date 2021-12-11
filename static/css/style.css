@@ -264,12 +264,7 @@ body {
     left: 100px;
     bottom: 50px;
 }
-#tc_done{
-    font-weight: bold;
-    font-size: 25px;
-    position: relative;
-    top: 200px;
-}
+
 
 /* teaminfo */
 .ti_wholebox {
