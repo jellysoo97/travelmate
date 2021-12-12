@@ -6,16 +6,18 @@
     </head>
     <body>
         {% block content %}
-            <form method="post" action="/register" class="reg_main">         
-                {{form.csrf_token}}
+            <form method="post" action="/register" class="reg_main">
+                {{form.csrf_token}}    
+
                 {%if form.userId.errors%}
-                    <div class="register_box error">{{form.userId.errors.0}}</div>
+                    <div class="register_box_1 error">{{form.userId.errors.0}}</div>
                 {%endif%}
 
-                {%if form.repassword.errors%}
-                    <div class="register_box error">{{form.repassword.errors.0}}</div>
+                {%if form.repassword.errors%}                
+                    <div class="register_box_2 error">{{form.repassword.errors.0}}</div>
                 {%endif%}
 
+                                
                     <div class="form-group">
                         {{form.userId.label("ID")}}
                         {{form.userId(class="form-control",placeholder="ID")}}

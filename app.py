@@ -88,6 +88,7 @@ def insertUserData():
         userdata.userMajor = form.data.get('userMajor')
         userdata.userLang = form.data.get('userLang')
 
+        flash('회원가입이 완료되었습니다.')
         db.session.add(userdata)
         db.session.commit()
 

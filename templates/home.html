@@ -6,13 +6,13 @@
     </head>
     <body>
         {% block content %}
-    {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <script>
-                    alert("{{messages[-1]}}")
-                </script>
-            {% endif %}
-        {% endwith %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <script>
+                        alert("{{messages[-1]}}")
+                    </script>
+                {% endif %}
+            {% endwith %}
             {% if userId %}
                 <h3>{{userId}}님 반갑습니다.</h3>
                 <a href="condition">
